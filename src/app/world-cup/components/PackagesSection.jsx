@@ -1,9 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-
-const GOLD = "text-[#e8c96b]";
-const GOLD_BG = "bg-[#e8c96b]";
-const GOLD_BORDER = "border-[#e8c96b]/30";
+import BookingFormPopup from "./BookingFormPopup";
 
 const PACKAGES = [
   {
@@ -27,9 +24,6 @@ const PACKAGES = [
       { label: "Corner / Goal", price: 2990 },
       { label: "Sup Longside", price: 3740 },
     ],
-    emailSubject: "Réservation Package 1 — Brésil vs Maroc",
-    emailBody: "Bonjour, je souhaite réserver le Package 1 (Brésil vs Maroc, New York). Merci de me contacter.",
-    waText: "Bonjour, je suis intéressé par le Package 1 (Brésil vs Maroc, New York)",
   },
   {
     id: 2,
@@ -53,14 +47,8 @@ const PACKAGES = [
       { label: "Corner / Goal", price: 3690 },
       { label: "Sup Longside", price: 4640 },
     ],
-    emailSubject: "Réservation Package 2 — 2 Matchs Maroc",
-    emailBody: "Bonjour, je souhaite réserver le Package 2 (2 Matchs Maroc, NY + Boston). Merci de me contacter.",
-    waText: "Bonjour, je suis intéressé par le Package 2 (2 Matchs Maroc, NY + Boston)",
   },
 ];
-
-const EMAIL = "contact@leonistravelmaroc.com";
-const WA = "212600000000";
 
 const IconHotel = () => (
   <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none" stroke="#e8c96b" strokeWidth="1.4">
@@ -108,11 +96,18 @@ function useInView() {
   return [ref, visible];
 }
 
-function PackageCard({ pkg, visible, delay }) {
+function PackageCard({ pkg, visible, delay, onBook }) {
   const [seat, setSeat] = useState(0);
   const price = pkg.seats[seat].price;
-  const emailHref = `mailto:${EMAIL}?subject=${encodeURIComponent(pkg.emailSubject)}&body=${encodeURIComponent(pkg.emailBody)}`;
-  const waHref = `https://wa.me/${WA}?text=${encodeURIComponent(pkg.waText)}`;
+
+  const handleReserve = () => {
+    onBook({
+      package: pkg.id === 1
+        ? "Package 1 — Brésil vs Maroc (New York)"
+        : "Package 2 — 2 Matchs Maroc (NY + Boston)",
+      categorie: pkg.seats[seat].label,
+    });
+  };
 
   return (
     <div
@@ -223,20 +218,12 @@ function PackageCard({ pkg, visible, delay }) {
           </p>
         </div>
         <div className="flex flex-col gap-2 items-end">
-          <a
-            href={emailHref}
-            className="text-[11px] font-bold tracking-[.22em] uppercase px-5 py-3 rounded-xl bg-[#e8c96b] text-[#12121f] hover:bg-[#d4b05a] transition-colors"
+          <button
+            onClick={handleReserve}
+            className="text-[11px] font-bold tracking-[.22em] uppercase px-5 py-3 rounded-xl bg-[#e8c96b] text-[#12121f] hover:bg-[#d4b05a] transition-colors cursor-pointer"
           >
             Réserver maintenant
-          </a>
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] font-semibold tracking-[.2em] uppercase px-4 py-2 rounded-lg border border-white/12 text-white/40 hover:text-white/70 hover:border-white/25 transition-all"
-          >
-            WhatsApp →
-          </a>
+          </button>
         </div>
       </div>
     </div>
@@ -245,60 +232,91 @@ function PackageCard({ pkg, visible, delay }) {
 
 export default function PackagesSection() {
   const [ref, visible] = useInView();
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [preselected, setPreselected] = useState(null);
+
+  const EMAIL = "contact@leonistravelmaroc.com";
+
+  // Auto-open popup on every page load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPopupOpen(true);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleBook = (data) => {
+    setPreselected(data);
+    setPopupOpen(true);
+  };
+
+  const handleGenericBook = () => {
+    setPreselected(null);
+    setPopupOpen(true);
+  };
 
   return (
-    <section id="packages" ref={ref} className="relative bg-[#0d0d1a] px-[clamp(20px,6vw,80px)] py-[clamp(48px,7vw,96px)] overflow-hidden">
-      {/* Glow */}
-      <div className="absolute inset-x-0 top-0 h-96 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(232,201,107,0.1),transparent)] pointer-events-none" />
+    <>
+      {/* Booking popup — persists across the page */}
+      <BookingFormPopup
+        isOpen={popupOpen}
+        onClose={() => setPopupOpen(false)}
+        preselectedPackage={preselected}
+      />
 
-      {/* Header */}
-      <div
-        className={`relative z-10 mb-[clamp(32px,5vw,56px)] transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
-      >
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-0.5 bg-[#e8c96b] rounded" />
-          <span className="text-[10px] font-bold tracking-[.32em] uppercase text-[#e8c96b]">
-            Packages Officiels · Lions de l'Atlas · Coupe du Monde 2026
-          </span>
-        </div>
-        <h2 className="font-['Bebas_Neue'] text-[clamp(44px,7vw,84px)] text-white leading-[.95] mb-3">
-          Choisissez votre<br />
-          <span className="text-[#e8c96b]">aventure</span>
-        </h2>
-        <p className="text-[clamp(13px,1.4vw,15px)] font-light leading-relaxed text-white/40 max-w-md">
-          Deux formules tout-inclus pour vivre la Coupe du Monde avec les Lions de l'Atlas — billets, hôtel 4★ et transferts.
-        </p>
-      </div>
+      <section id="packages" ref={ref} className="relative bg-[#0d0d1a] px-[clamp(20px,6vw,80px)] py-[clamp(48px,7vw,96px)] overflow-hidden">
+        {/* Glow */}
+        <div className="absolute inset-x-0 top-0 h-96 bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(232,201,107,0.1),transparent)] pointer-events-none" />
 
-      {/* Cards */}
-      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-5">
-        {PACKAGES.map((pkg, i) => (
-          <PackageCard key={pkg.id} pkg={pkg} visible={visible} delay={0.15 + i * 0.15} />
-        ))}
-      </div>
-
-      {/* Bottom strip */}
-      <div
-        className={`relative z-10 mt-10 pt-7 border-t border-white/6 flex items-center justify-between flex-wrap gap-4 transition-opacity duration-700 delay-500 ${visible ? "opacity-100" : "opacity-0"}`}
-      >
-        <div>
-          <p className="text-sm font-light text-white/30 mb-1">Besoin d'un accompagnement personnalisé ?</p>
-          <p className="text-sm text-white/60">
-            <strong className="font-medium text-white/85">Public Events × Leonis Travel</strong> — votre équipe dédiée à Casablanca
+        {/* Header */}
+        <div
+          className={`relative z-10 mb-[clamp(32px,5vw,56px)] transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-0.5 bg-[#e8c96b] rounded" />
+            <span className="text-[10px] font-bold tracking-[.32em] uppercase text-[#e8c96b]">
+              Packages Officiels · Lions de l'Atlas · Coupe du Monde 2026
+            </span>
+          </div>
+          <h2 className="font-['Bebas_Neue'] text-[clamp(44px,7vw,84px)] text-white leading-[.95] mb-3">
+            Choisissez votre<br />
+            <span className="text-[#e8c96b]">aventure</span>
+          </h2>
+          <p className="text-[clamp(13px,1.4vw,15px)] font-light leading-relaxed text-white/40 max-w-md">
+            Deux formules tout-inclus pour vivre la Coupe du Monde avec les Lions de l'Atlas — billets, hôtel 4★ et transferts.
           </p>
         </div>
-        <a
-          href={`mailto:${EMAIL}?subject=${encodeURIComponent("Demande d'information — World Cup 26 Package Maroc")}`}
-          className="text-[11px] font-bold tracking-[.22em] uppercase px-6 py-3 rounded-xl border border-[#e8c96b]/35 text-[#e8c96b] hover:bg-[#e8c96b]/10 transition-colors"
-        >
-          Demander un devis →
-        </a>
-      </div>
 
-      {/* Disclaimer */}
-      <p className="relative z-10 mt-4 text-[10px] font-light text-white/18 leading-relaxed">
-        * L'hôtel mentionné est susceptible d'être remplacé par un établissement de standing similaire ou supérieur. Prix TTC par personne. Vols non inclus.
-      </p>
-    </section>
+        {/* Cards */}
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-5">
+          {PACKAGES.map((pkg, i) => (
+            <PackageCard key={pkg.id} pkg={pkg} visible={visible} delay={0.15 + i * 0.15} onBook={handleBook} />
+          ))}
+        </div>
+
+        {/* Bottom strip */}
+        <div
+          className={`relative z-10 mt-10 pt-7 border-t border-white/6 flex items-center justify-between flex-wrap gap-4 transition-opacity duration-700 delay-500 ${visible ? "opacity-100" : "opacity-0"}`}
+        >
+          <div>
+            <p className="text-sm font-light text-white/30 mb-1">Besoin d'un accompagnement personnalisé ?</p>
+            <p className="text-sm text-white/60">
+              <strong className="font-medium text-white/85">Public Events × Leonis Travel</strong> — votre équipe dédiée à Casablanca
+            </p>
+          </div>
+          <button
+            onClick={handleGenericBook}
+            className="text-[11px] font-bold tracking-[.22em] uppercase px-6 py-3 rounded-xl border border-[#e8c96b]/35 text-[#e8c96b] hover:bg-[#e8c96b]/10 transition-colors cursor-pointer"
+          >
+            Demander un devis →
+          </button>
+        </div>
+
+        {/* Disclaimer */}
+        <p className="relative z-10 mt-4 text-[10px] font-light text-white/18 leading-relaxed">
+          * L'hôtel mentionné est susceptible d'être remplacé par un établissement de standing similaire ou supérieur. Prix TTC par personne. Vols non inclus.
+        </p>
+      </section>
+    </>
   );
 }

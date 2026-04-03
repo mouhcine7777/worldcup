@@ -50,8 +50,8 @@ export default function HeroSection() {
               style={{ fontFamily: "'Bebas Neue', sans-serif", lineHeight: 0.9 }}
               className="text-[clamp(52px,8vw,88px)] tracking-wide mb-6 opacity-0 animate-[fadeUp_0.7s_ease_0.4s_forwards]"
             >
-              <span className="font-adidas text-white block">World Cup</span>
-              <span className="font-adidas text-[#C9A84C] block">2026</span>
+              <span className="font-['Bebas_Neue'] text-white block">World Cup</span>
+              <span className="font-['Bebas_Neue'] text-[#C9A84C] block">2026</span>
             </h1>
 
             {/* Description */}

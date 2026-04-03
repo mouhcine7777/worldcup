@@ -9,7 +9,7 @@ import FooterSection from "./components/FooterSection";
 export default function Home() {
   return (
     <main>
-        <StickyMenu />
+      <StickyMenu />
       <HeroSectionWC />
       <AboutSection />
       <PackagesSection />
