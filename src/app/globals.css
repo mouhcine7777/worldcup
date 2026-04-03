@@ -1,15 +1,26 @@
 @import "tailwindcss";
 
+/* ✅ Custom Adidas Font */
+@font-face {
+  font-family: "Adidas";
+  src: url("/fonts/Adidas.ttf") format("truetype");
+  font-display: swap;
+}
+
+/* Base colors */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/* Tailwind v4 theme */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Fonts */
+  --font-sans: var(--font-montserrat);
+  --font-adidas: "Adidas", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +30,9 @@
   }
 }
 
+/* Base styles */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }

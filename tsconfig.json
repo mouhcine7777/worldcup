@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/world-cup/components/PackagesSection.jsx", "src/app/world-cup/components/StickyMenu.jsx"],
   "exclude": ["node_modules"]
 }
