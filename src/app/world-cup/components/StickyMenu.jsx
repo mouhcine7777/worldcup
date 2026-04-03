@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import BookingFormPopup from "./BookingFormPopup"; // Assurez-vous que le chemin est correct
 
 const NAV_LINKS = [
   { label: "Accueil", href: "#hero" },
@@ -9,11 +10,13 @@ const NAV_LINKS = [
   { label: "Hôtels", href: "#hotels" },
 ];
 
-export default function NavBar({ onOpenForm = null }) {
+export default function NavBar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
   const [pulse, setPulse] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -46,6 +49,16 @@ export default function NavBar({ onOpenForm = null }) {
     const id = href.replace("#", "");
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleOpenForm = (packageData = null) => {
+    setSelectedPackage(packageData);
+    setIsPopupOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsPopupOpen(false);
+    setSelectedPackage(null);
   };
 
   return (
@@ -230,7 +243,7 @@ export default function NavBar({ onOpenForm = null }) {
 
             {/* Main CTA */}
             <button
-              onClick={() => onOpenForm && onOpenForm()}
+              onClick={() => handleOpenForm()}
               className={pulse ? "cta-pulse" : ""}
               style={{
                 fontFamily: "'Barlow Condensed', sans-serif",
@@ -261,9 +274,7 @@ export default function NavBar({ onOpenForm = null }) {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              {/* Flag emoji */}
               Réserver ma place
-              {/* Arrow */}
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6h8M7 3l3 3-3 3" stroke="#080810" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -355,7 +366,7 @@ export default function NavBar({ onOpenForm = null }) {
             {/* Mobile CTA */}
             <li style={{ padding: "16px clamp(20px,5vw,56px) 20px" }}>
               <button
-                onClick={() => { setMenuOpen(false); onOpenForm && onOpenForm(); }}
+                onClick={() => { setMenuOpen(false); handleOpenForm(); }}
                 style={{
                   width: "100%",
                   fontFamily: "'Barlow Condensed', sans-serif",
@@ -392,6 +403,13 @@ export default function NavBar({ onOpenForm = null }) {
           </ul>
         </div>
       </nav>
+
+      {/* Booking Form Popup */}
+      <BookingFormPopup 
+        isOpen={isPopupOpen}
+        onClose={handleCloseForm}
+        preselectedPackage={selectedPackage}
+      />
     </>
   );
 }
