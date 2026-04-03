@@ -1,15 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 export default function HeroSection() {
-  const [scrollY, setScrollY] = useState(0);
 
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const scrollTo = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <>
@@ -19,7 +14,7 @@ export default function HeroSection() {
       />
 
       <section
-      id="hero"
+        id="hero"
         style={{ height: "100dvh", minHeight: 600 }}
         className="relative flex flex-col w-full overflow-hidden bg-[#0a0a0a]"
       >
@@ -73,12 +68,14 @@ export default function HeroSection() {
               <button
                 style={{ fontFamily: "'Barlow Condensed', sans-serif" }}
                 className="font-adidas text-sm font-bold tracking-widest uppercase px-9 py-3.5 bg-[#C9A84C] text-black hover:bg-[#d4b05a] transition-colors duration-200"
+                onClick={() => scrollTo("packages")}
               >
                 Voir les packages
               </button>
               <button
                 style={{ fontFamily: "'Barlow Condensed', sans-serif" }}
                 className="font-adidas text-sm font-semibold tracking-widest uppercase text-white/50 hover:text-white/80 transition-colors duration-200"
+                onClick={() => scrollTo("about")}
               >
                 Les matchs →
               </button>
